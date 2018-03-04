@@ -20,9 +20,9 @@ public:
 
   bool check_block_verification_context(const TycheCash::block_verification_context& bvc, size_t eventIdx, const TycheCash::Block& /*blk*/) {
     if (m_invalidBlockIdx == eventIdx) {
-      return bvc.m_verifivation_failed;
+      return bvc.m_verification_failed;
     } else {
-      return !bvc.m_verifivation_failed;
+      return !bvc.m_verification_failed;
     }
   }
 

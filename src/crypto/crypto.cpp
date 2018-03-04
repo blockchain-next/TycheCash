@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 The TycheCash developers  ; Originally forked from Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers 
+// Copyright (c) 2017-2018 The TycheCash developers  ; Originally forked from Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,6 +16,12 @@
 #include "hash.h"
 
 namespace Crypto {
+
+  const unsigned char I_[32] = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+  const unsigned char L_[32] = { 0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10 };
+
+  const KeyImage I = *reinterpret_cast<const KeyImage*>(I_);
+  const KeyImage L = *reinterpret_cast<const KeyImage*>(L_);
 
   using std::abort;
   using std::int32_t;
@@ -285,6 +291,23 @@ namespace Crypto {
     ge_p1p1_to_p3(&res, &point2);
   }
 
+  KeyImage crypto_ops::scalarmultKey(const KeyImage & P, const KeyImage & a) {
+    ge_p3 A;
+    ge_p2 R;
+    ge_frombytes_vartime(&A, reinterpret_cast<const unsigned char*>(&P));
+    ge_scalarmult(&R, reinterpret_cast<const unsigned char*>(&a), &A);
+    KeyImage aP;
+    ge_tobytes(reinterpret_cast<unsigned char*>(&aP), &R);
+    return aP;
+  }
+
+  bool crypto_ops::validateKeyImage(const KeyImage& ki) {
+    if (!(scalarmultKey(ki, L) == I)) {
+      return false;
+    }
+    return true;
+  }
+
   void crypto_ops::hash_data_to_ec(const uint8_t* data, std::size_t len, PublicKey& key) {
     Hash h;
     ge_p2 point;
@@ -295,7 +318,7 @@ namespace Crypto {
     ge_p1p1_to_p2(&point, &point2);
     ge_tobytes(reinterpret_cast<unsigned char*>(&key), &point);
   }
-  
+
   void crypto_ops::generate_key_image(const PublicKey &pub, const SecretKey &sec, KeyImage &image) {
     ge_p3 point;
     ge_p2 point2;
@@ -304,7 +327,7 @@ namespace Crypto {
     ge_scalarmult(&point2, reinterpret_cast<const unsigned char*>(&sec), &point);
     ge_tobytes(reinterpret_cast<unsigned char*>(&image), &point2);
   }
-  
+
   void crypto_ops::generate_incomplete_key_image(const PublicKey &pub, EllipticCurvePoint &incomplete_key_image) {
     ge_p3 point;
     hash_to_ec(pub, point);

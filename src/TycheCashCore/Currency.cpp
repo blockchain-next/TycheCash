@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 The TycheCash developers  ; Originally forked from Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers 
+// Copyright (c) 2017-2018 The TycheCash developers  ; Originally forked from Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -270,7 +270,7 @@ bool Currency::isAmountApplicableInFusionTransactionInput(uint64_t amount, uint6
   auto it = std::lower_bound(PRETTY_AMOUNTS.begin(), PRETTY_AMOUNTS.end(), amount);
   if (it == PRETTY_AMOUNTS.end() || amount != *it) {
     return false;
-  } 
+  }
 
   amountPowerOfTen = static_cast<uint8_t>(std::distance(PRETTY_AMOUNTS.begin(), it) / 9);
   return true;
@@ -395,6 +395,54 @@ difficulty_type Currency::nextDifficulty(std::vector<uint64_t> timestamps,
   }
 
   return (low + timeSpan - 1) / timeSpan;
+}
+
+difficulty_type Currency::nextDifficultyV2(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties,
+  size_t targetSeconds /*= parameters::DIFFICULTY_TARGET*/) const {
+  assert(m_difficultyWindow >= 2);
+
+  if (timestamps.size() > m_difficultyWindow) {
+    timestamps.resize(m_difficultyWindow);
+    cumulativeDifficulties.resize(m_difficultyWindow);
+  }
+
+  size_t length = timestamps.size();
+  assert(length == cumulativeDifficulties.size());
+  if (length <= 1) {
+    return 1;
+  }
+
+  uint64_t weightedTimespans = 0;
+  for (size_t i = 1; i < length; i++) {
+    uint64_t timespan;
+    if (timestamps[i - 1] >= timestamps[i]) {
+      timespan = 1;
+    } else {
+      timespan = timestamps[i] - timestamps[i - 1];
+    }
+    if (timespan > 10 * targetSeconds) {
+      timespan = 10 * targetSeconds;
+    }
+    weightedTimespans += i * timespan;
+  }
+
+  // N = length - 1
+  uint64_t minimumTimespan = targetSeconds * (length - 1) / 2;
+  if (weightedTimespans < minimumTimespan) {
+    weightedTimespans = minimumTimespan;
+  }
+
+  difficulty_type totalWork = cumulativeDifficulties.back() - cumulativeDifficulties.front();
+  assert(totalWork > 0);
+
+  uint64_t low, high;
+  // adjust = 0.99 for N=60 ; length = N + 1
+  uint64_t target = 99 * (length / 2) * targetSeconds / 100;
+  low = mul128(totalWork, target, &high);
+  if (high != 0) {
+    return 0;
+  }
+  return low / weightedTimespans;
 }
 
 bool Currency::checkProofOfWork(Crypto::cn_context& context, const Block& block, difficulty_type currentDiffic,

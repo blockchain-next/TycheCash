@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 The TycheCash developers  ; Originally forked from Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers 
+// Copyright (c) 2017-2018 The TycheCash developers  ; Originally forked from Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -69,6 +69,8 @@ struct EllipticCurveScalar {
     friend bool check_signature(const Hash &, const PublicKey &, const Signature &);
     static void generate_key_image(const PublicKey &, const SecretKey &, KeyImage &);
     friend void generate_key_image(const PublicKey &, const SecretKey &, KeyImage &);
+    static KeyImage scalarmultKey(const KeyImage & P, const KeyImage & a);
+    friend KeyImage scalarmultKey(const KeyImage & P, const KeyImage & a);
     static void hash_data_to_ec(const uint8_t*, std::size_t, PublicKey&);
     friend void hash_data_to_ec(const uint8_t*, std::size_t, PublicKey&);
     static void generate_ring_signature(const Hash &, const KeyImage &,
@@ -79,6 +81,8 @@ struct EllipticCurveScalar {
       const PublicKey *const *, size_t, const Signature *);
     friend bool check_ring_signature(const Hash &, const KeyImage &,
       const PublicKey *const *, size_t, const Signature *);
+    friend bool validateKeyImage(const KeyImage& ki);
+    static bool validateKeyImage(const KeyImage& ki);
   };
 
   /* Generate a value filled with random bytes.
@@ -163,7 +167,7 @@ struct EllipticCurveScalar {
     const PublicKey &derived_key, PublicKey &base, EllipticCurveScalar &hashed_derivation) {
     return crypto_ops::underive_public_key_and_get_scalar(derivation, output_index, derived_key, base, hashed_derivation);
   }
-  
+
   inline void derive_secret_key(const KeyDerivation &derivation, std::size_t output_index,
     const SecretKey &base, const uint8_t* prefix, size_t prefixLength, SecretKey &derived_key) {
     crypto_ops::derive_secret_key(derivation, output_index, base, prefix, prefixLength, derived_key);
@@ -206,6 +210,10 @@ struct EllipticCurveScalar {
     crypto_ops::generate_key_image(pub, sec, image);
   }
 
+  inline KeyImage scalarmultKey(const KeyImage & P, const KeyImage & a) {
+    return crypto_ops::scalarmultKey(P, a);
+  }
+
   inline void hash_data_to_ec(const uint8_t* data, std::size_t len, PublicKey& key) {
     crypto_ops::hash_data_to_ec(data, len, key);
   }
@@ -236,6 +244,9 @@ struct EllipticCurveScalar {
     return check_ring_signature(prefix_hash, image, pubs.data(), pubs.size(), sig);
   }
 
+  inline bool validateKeyImage(const KeyImage& ki) {
+    return crypto_ops::validateKeyImage(ki);
+  }
 }
 
 CRYPTO_MAKE_HASHABLE(PublicKey)

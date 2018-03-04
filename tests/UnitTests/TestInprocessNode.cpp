@@ -687,7 +687,7 @@ TEST_F(InProcessNodeTests, getPoolDiffereceActualBC) {
     bool keptByBlock = false;
     coreStub.handleIncomingTransaction(tx, TycheCash::getObjectHash(tx), TycheCash::getObjectBinarySize(tx), tvc, keptByBlock);
     ASSERT_TRUE(tvc.m_added_to_pool);
-    ASSERT_FALSE(tvc.m_verifivation_failed);
+    ASSERT_FALSE(tvc.m_verification_failed);
   }
 
   ASSERT_EQ(transactionHashes.size(), POOL_TX_NUMBER);
@@ -726,7 +726,7 @@ TEST_F(InProcessNodeTests, getPoolDiffereceNotActualBC) {
     bool keptByBlock = false;
     coreStub.handleIncomingTransaction(tx, TycheCash::getObjectHash(tx), TycheCash::getObjectBinarySize(tx), tvc, keptByBlock);
     ASSERT_TRUE(tvc.m_added_to_pool);
-    ASSERT_FALSE(tvc.m_verifivation_failed);
+    ASSERT_FALSE(tvc.m_verification_failed);
   }
 
   ASSERT_EQ(transactionHashes.size(), POOL_TX_NUMBER);

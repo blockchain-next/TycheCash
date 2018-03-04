@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 The TycheCash developers  ; Originally forked from Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers 
+// Copyright (c) 2017-2018 The TycheCash developers  ; Originally forked from Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -76,7 +76,7 @@ namespace TycheCash {
       }
       return true;
     }
-    
+
     std::unordered_set<Crypto::KeyImage> m_keyImages;
     std::set<std::pair<uint64_t, uint64_t>> m_usedOutputs;
     std::vector<Crypto::Hash> m_txHashes;
@@ -86,27 +86,33 @@ namespace TycheCash {
 
   //---------------------------------------------------------------------------------
   tx_memory_pool::tx_memory_pool(
-    const TycheCash::Currency& currency, 
-    TycheCash::ITransactionValidator& validator, 
+    const TycheCash::Currency& currency,
+    TycheCash::ITransactionValidator& validator,
     TycheCash::ITimeProvider& timeProvider,
     Logging::ILogger& log) :
     m_currency(currency),
-    m_validator(validator), 
-    m_timeProvider(timeProvider), 
+    m_validator(validator),
+    m_timeProvider(timeProvider),
     m_txCheckInterval(60, timeProvider),
     m_fee_index(boost::get<1>(m_transactions)),
     logger(log, "txpool") {
   }
   //---------------------------------------------------------------------------------
   bool tx_memory_pool::add_tx(const Transaction &tx, /*const Crypto::Hash& tx_prefix_hash,*/ const Crypto::Hash &id, size_t blobSize, tx_verification_context& tvc, bool keptByBlock) {
+    if(!keptByBlock && blobSize > parameters::MAX_TRANSACTION_SIZE_LIMIT) {
+      logger(INFO) << "transaction is too big (" << blobSize << ")bytes for current transaction flow, tx_id: " << id;
+      tvc.m_verification_failed = true;
+      return false;
+    }
+
     if (!check_inputs_types_supported(tx)) {
-      tvc.m_verifivation_failed = true;
+      tvc.m_verification_failed = true;
       return false;
     }
 
     uint64_t inputs_amount = 0;
     if (!get_inputs_money_amount(tx, inputs_amount)) {
-      tvc.m_verifivation_failed = true;
+      tvc.m_verification_failed = true;
       return false;
     }
 
@@ -115,7 +121,7 @@ namespace TycheCash {
     if (outputs_amount > inputs_amount) {
       logger(INFO) << "transaction use more money then it has: use " << m_currency.formatAmount(outputs_amount) <<
         ", have " << m_currency.formatAmount(inputs_amount);
-      tvc.m_verifivation_failed = true;
+      tvc.m_verification_failed = true;
       return false;
     }
 
@@ -124,7 +130,7 @@ namespace TycheCash {
     if (!keptByBlock && !isFusionTransaction && fee < m_currency.minimumFee()) {
       logger(INFO) << "transaction fee is not enough: " << m_currency.formatAmount(fee) <<
         ", minimum fee: " << m_currency.formatAmount(m_currency.minimumFee());
-      tvc.m_verifivation_failed = true;
+      tvc.m_verification_failed = true;
       tvc.m_tx_fee_too_small = true;
       return false;
     }
@@ -134,7 +140,14 @@ namespace TycheCash {
       std::lock_guard<std::recursive_mutex> lock(m_transactions_lock);
       if (haveSpentInputs(tx)) {
         logger(INFO) << "Transaction with id= " << id << " used already spent inputs";
-        tvc.m_verifivation_failed = true;
+        tvc.m_verification_failed = true;
+        return false;
+      }
+
+      //transaction spam protection, soft rule
+      if (inputs_amount - outputs_amount < parameters::MINIMUM_FEE) {
+        logger(INFO) << "Transaction with id= " << id << " has to small fee: " << inputs_amount - outputs_amount << ", expected fee: " << parameters::MINIMUM_FEE;
+        tvc.m_verification_failed = true;
         return false;
       }
     }
@@ -147,7 +160,7 @@ namespace TycheCash {
     if (!inputsValid) {
       if (!keptByBlock) {
         logger(INFO) << "tx used wrong inputs, rejected";
-        tvc.m_verifivation_failed = true;
+        tvc.m_verification_failed = true;
         return false;
       }
 
@@ -159,7 +172,7 @@ namespace TycheCash {
       bool sizeValid = m_validator.checkTransactionSize(blobSize);
       if (!sizeValid) {
         logger(INFO) << "tx too big, rejected";
-        tvc.m_verifivation_failed = true;
+        tvc.m_verification_failed = true;
         return false;
       }
     }
@@ -168,7 +181,7 @@ namespace TycheCash {
 
     if (!keptByBlock && m_recentlyDeletedTransactions.find(id) != m_recentlyDeletedTransactions.end()) {
       logger(INFO) << "Trying to add recently deleted transaction. Ignore: " << id;
-      tvc.m_verifivation_failed = false;
+      tvc.m_verification_failed = false;
       tvc.m_should_be_relayed = false;
       tvc.m_added_to_pool = false;
       return true;
@@ -200,12 +213,12 @@ namespace TycheCash {
 
     tvc.m_added_to_pool = true;
     tvc.m_should_be_relayed = inputsValid && (fee > 0 || isFusionTransaction);
-    tvc.m_verifivation_failed = true;
+    tvc.m_verification_failed = true;
 
     if (!addTransactionInputs(id, tx, keptByBlock))
       return false;
 
-    tvc.m_verifivation_failed = false;
+    tvc.m_verification_failed = false;
     //succeed
     return true;
   }
@@ -320,7 +333,7 @@ namespace TycheCash {
     std::lock_guard<std::recursive_mutex> lock(m_transactions_lock);
     for (const auto& txd : m_fee_index) {
       ss << "id: " << txd.id << std::endl;
-      
+
       if (!short_format) {
         ss << storeToJson(txd.tx) << std::endl;
       }
@@ -432,7 +445,7 @@ namespace TycheCash {
 
     m_paymentIdIndex.clear();
     m_timestampIndex.clear();
-    
+
     return true;
   }
 

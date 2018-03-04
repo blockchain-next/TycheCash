@@ -1,15 +1,15 @@
-// Copyright (c) 2017-2018 The TycheCash developers  ; Originally forked from Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers 
+// Copyright (c) 2017-2018 The TycheCash developers  ; Originally forked from Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <string.h>
-#include "context.h"
+#include "Context.h"
 
 void
 makecontext(uctx *ucp, void (*func)(void), intptr_t arg)
 {
   long *sp;
-  
+
   memset(&ucp->uc_mcontext, 0, sizeof ucp->uc_mcontext);
   ucp->uc_mcontext.mc_rdi = (long)arg;
   sp = (long*)ucp->uc_stack.ss_sp+ucp->uc_stack.ss_size/sizeof(long);

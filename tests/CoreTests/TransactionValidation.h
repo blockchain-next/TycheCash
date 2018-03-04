@@ -18,17 +18,17 @@ struct get_tx_validation_base : public test_chain_unit_base
   bool check_tx_verification_context(const TycheCash::tx_verification_context& tvc, bool tx_added, size_t event_idx, const TycheCash::Transaction& /*tx*/)
   {
     if (m_invalid_tx_index == event_idx)
-      return tvc.m_verifivation_failed;
+      return tvc.m_verification_failed;
     else
-      return !tvc.m_verifivation_failed && tx_added;
+      return !tvc.m_verification_failed && tx_added;
   }
 
   bool check_block_verification_context(const TycheCash::block_verification_context& bvc, size_t event_idx, const TycheCash::Block& /*block*/)
   {
     if (m_invalid_block_index == event_idx)
-      return bvc.m_verifivation_failed;
+      return bvc.m_verification_failed;
     else
-      return !bvc.m_verifivation_failed;
+      return !bvc.m_verification_failed;
   }
 
   bool mark_invalid_block(TycheCash::core& /*c*/, size_t ev_index, const std::vector<test_event_entry>& /*events*/)

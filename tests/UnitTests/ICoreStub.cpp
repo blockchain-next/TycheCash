@@ -326,7 +326,7 @@ std::unique_ptr<TycheCash::IBlock> ICoreStub::getBlock(const Crypto::Hash& block
 
 bool ICoreStub::handleIncomingTransaction(const TycheCash::Transaction& tx, const Crypto::Hash& txHash, size_t blobSize, TycheCash::tx_verification_context& tvc, bool keptByBlock) {
   auto result = transactionPool.emplace(std::make_pair(txHash, tx));
-  tvc.m_verifivation_failed = !poolTxVerificationResult;
+  tvc.m_verification_failed = !poolTxVerificationResult;
   tvc.m_added_to_pool = true;
   tvc.m_should_be_relayed = result.second;
   return poolTxVerificationResult;
