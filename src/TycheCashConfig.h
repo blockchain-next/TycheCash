@@ -114,6 +114,7 @@ const std::initializer_list<CheckpointData> CHECKPOINTS = {
   { 4000, "402857b98b6c13b0aa3368db7bb728b3e41228a400bd4a695a6494d2f9db7ece" },
   { 8000, "a6ad53c7f7edc68147a8cddf3325152b0b2eb93fec1ef6d0dc7525258c604da2" },
   { 12297, "3898d249c97cebac322582a6b3f3ccc5943d6859ad26304e75397d8f0c5921c6" },
+  { 15000, "e8a7c64302d8d5ea3d66e17ea36a4a18f7c1334b7d497b328a3db2fca4f753c6" },
 };
 
 } // TycheCash
