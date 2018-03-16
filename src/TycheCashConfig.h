@@ -93,9 +93,7 @@ const char     P2P_STAT_TRUSTED_PUB_KEY[]                   = "8f80f9a5a434a9f15
 
 const std::initializer_list<const char*> SEED_NODES = {
   "159.65.196.250:17017",
-  "159.89.102.76:17017",
   "46.101.227.89:17017",
-  "159.65.160.112:17017",
 };
 
 struct CheckpointData {
@@ -115,6 +113,7 @@ const std::initializer_list<CheckpointData> CHECKPOINTS = {
   { 8000, "a6ad53c7f7edc68147a8cddf3325152b0b2eb93fec1ef6d0dc7525258c604da2" },
   { 12297, "3898d249c97cebac322582a6b3f3ccc5943d6859ad26304e75397d8f0c5921c6" },
   { 15000, "e8a7c64302d8d5ea3d66e17ea36a4a18f7c1334b7d497b328a3db2fca4f753c6" },
+  { 20000, "731a4512037b155b8fa1083c9f2b91c7df25b1bb51ec6142fae900954055c6e8" },
 };
 
 } // TycheCash
