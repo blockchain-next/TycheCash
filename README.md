@@ -39,6 +39,7 @@ $`sudo apt install build-essential cmake pkg-config libboost-all-dev libssl-dev 
 Though all of them are not necessary but in case of further updates it will be useful to have them all ready.
   ### Install gtest
   $`sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake . && sudo make && sudo mv libg* /usr/lib/`
+  
   $`cd`  
 ## Clone repository
 
@@ -79,8 +80,11 @@ Install Xcode
   Open Terminal
   
   $`cd Downloads`
+  
   $`tar --bzip2 -xf boost_1_67_0.tar.bz2`
+  
   $`cd boost_1_167_0`
+  
   $`./bootstrap.sh --prefix=/usr/local/include`
   
   $`sudo ./b2 install`
@@ -93,9 +97,11 @@ Install Xcode
   Download Cmake from : https://cmake.org/files/v3.11/cmake-3.11.1.tar.gz
   
   Install Cmake and copy CMake to Apllications 
+  
   On terminal
   
   $` sudo "/Applications/CMake.app/Contents/bin/cmake-gui" --install`
+  
 ## Clone repository
 
 $`git clone https://github.com/blockchain-next/TycheCash`
