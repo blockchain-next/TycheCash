@@ -37,7 +37,7 @@ on demon type:
 $`sudo apt install build-essential cmake pkg-config libboost-all-dev libssl-dev libunbound-dev libminiupnpc-dev libunwind8-dev liblzma-dev libldns-dev libexpat1-dev libgtest-dev doxygen graphviz` 
 
 Though all of them are not necessary but in case of further updates it will be useful to have them all ready.
-  ### Insatall gtest
+  ### Install gtest
   $`sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake . && sudo make && sudo mv libg* /usr/lib/`
   $`cd`  
 ## Clone repository
