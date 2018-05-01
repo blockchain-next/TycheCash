@@ -82,8 +82,11 @@ Install Xcode
   $`tar --bzip2 -xf boost_1_67_0.tar.bz2`
   $`cd boost_1_167_0`
   $`./bootstrap.sh --prefix=/usr/local/include`
+  
   $`sudo ./b2 install`
+  
   Enter your MacOS password when prompted
+  
   $`cd`
   
   ### Install CMake 
