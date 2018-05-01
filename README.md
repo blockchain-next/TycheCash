@@ -8,27 +8,27 @@ Note : As of now only libboost1.55-all-dev works and so either work on Ubuntu 14
 
 ## Clone repository
 
-$git clone https://github.com/blockchain-next/TycheCash
+`$git clone https://github.com/blockchain-next/TycheCash`
 
 ## Make TycheCash
 
-$cd TycheCash
+`$cd TycheCash`
 
-$make or make -j (if parrlel processing is supported)
+`$make or make -j (if parrlel processing is supported)`
 
 ## Running demon and mining
 
 ## 1st create a wallet
-$./simplewallet 
+`$./simplewallet`
 
 follow the instructions and note wallet address and remeber password
 
 Run demon :
 
-$cd build/release/src
+$`cd build/release/src`
 
-$./TycheCash
+$`./TycheCash`
 
 on demon type:
 
-start_mining YOURWALLETADDRESS
+`start_mining YOURWALLETADDRESS`
