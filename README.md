@@ -19,7 +19,7 @@ Note : As of now only libboost1.55-all-dev works and so either work on Ubuntu 14
 ## Running demon and mining
 
 ## 1st create a wallet
-`$./simplewallet`
+$`./simplewallet`
 
 follow the instructions and note wallet address and remeber password
 
