@@ -4,8 +4,6 @@
 ## Install Dependencies 
 `$sudo apt-get install build-essential git cmake libboost1.55-all-dev` 
 
-Note : As of now only libboost1.55-all-dev works and so either work on Ubuntu 14.x or for higher versions make libboost1.55 for your system
-
 ## Clone repository
 
 `$git clone https://github.com/blockchain-next/TycheCash`
