@@ -75,7 +75,9 @@ Install Xcode
   ### Install boost
   
   Get boost from : https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2
+  
   Open Terminal
+  
   $`cd Downloads`
   $`tar --bzip2 -xf boost_1_67_0.tar.bz2`
   $`cd boost_1_167_0`
@@ -86,8 +88,10 @@ Install Xcode
   
   ### Install CMake 
   Download Cmake from : https://cmake.org/files/v3.11/cmake-3.11.1.tar.gz
+  
   Install Cmake and copy CMake to Apllications 
-  On terminal 
+  On terminal
+  
   $` sudo "/Applications/CMake.app/Contents/bin/cmake-gui" --install`
 ## Clone repository
 
