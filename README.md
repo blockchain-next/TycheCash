@@ -1,5 +1,5 @@
 # TycheCash
-## Ubuntu 14.xx Intall Guide
+## Ubuntu 14.xx Install Guide
 
 ## Install Dependencies 
 $sudo apt-get install build-essential git cmake libboost1.55-all-dev 
