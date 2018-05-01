@@ -110,7 +110,7 @@ $`git clone https://github.com/blockchain-next/TycheCash`
 
 $`cd TycheCash`
 
-$`make or make -j (if parrlel processing is supported)`
+$`make -j (if parrlel processing is supported)`
 
 You can generate Xcode Xproject file to be opened and compiled in Xcode GUI by 
 $`cmake -G xcode ..`
@@ -132,3 +132,4 @@ on demon type:
 
 `start_mining YOURWALLETADDRESS`
 
+## Windows Install Guide
