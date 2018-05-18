@@ -17,6 +17,7 @@ const uint64_t TycheCash_PUBLIC_ADDRESS_BASE58_PREFIX       = 0x31;
 const size_t   TycheCash_MINED_MONEY_UNLOCK_WINDOW          = 60;
 const uint64_t TycheCash_BLOCK_FUTURE_TIME_LIMIT            = 60 * 60 * 2;
 const size_t   TycheCash_HARDFORK_HEIGHT_V2                 = 12998;
+const size_t   TycheCash_HARDFORK_HEIGHT_V3		    = 61010;
 
 const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW            = 30;
 
@@ -32,11 +33,22 @@ const uint64_t MAX_TRANSACTION_SIZE_LIMIT                   = TycheCash_BLOCK_GR
 const uint64_t MINIMUM_FEE                                  = UINT64_C(1000000);
 const uint64_t DEFAULT_DUST_THRESHOLD                       = UINT64_C(1000000);
 
-const uint64_t DIFFICULTY_TARGET                            = 120; // seconds
-const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY            = 24 * 60 * 60 / DIFFICULTY_TARGET;
-const size_t   DIFFICULTY_WINDOW                            = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY; // blocks
-const size_t   DIFFICULTY_CUT                               = 60; // timestamps to cut after sorting
-const size_t   DIFFICULTY_LAG                               = 15;
+const uint64_t DIFFICULTY_TARGET = 120; // seconds
+const uint64_t TycheCah_BLOCK_FUTURE_TIME_LIMIT_V2 = 7 * DIFFICULTY_TARGET;
+const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY = 24 * 60 * 60 / DIFFICULTY_TARGET;
+const size_t   DIFFICULTY_WINDOW = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
+const size_t   DIFFICULTY_WINDOW_V1 = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
+const size_t   DIFFICULTY_WINDOW_V2 = 70;
+const size_t   DIFFICULTY_WINDOW_V3 = 70;
+const size_t   DIFFICULTY_CUT = 60;  // timestamps to cut after sorting
+const size_t   DIFFICULTY_CUT_V1 = 60;
+const size_t   DIFFICULTY_CUT_V2 = 60;
+const size_t   DIFFICULTY_CUT_V3 = 60;
+const size_t   DIFFICULTY_LAG = 15;  // !!!
+const size_t   DIFFICULTY_LAG_V1 = 15;
+const size_t   DIFFICULTY_LAG_V2 = 15;
+const size_t   DIFFICULTY_LAG_V3 = 0;
+static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
 
 const size_t   MAX_BLOCK_SIZE_INITIAL                       = 20 * 1024;
 const uint64_t MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR        = 100 * 1024;
@@ -65,9 +77,15 @@ const char     MINER_CONFIG_FILE_NAME[]                     = "miner_conf.json";
 const char     TycheCash_NAME[]                             = "TycheCash";
 const char     GENESIS_COINBASE_TX_HEX[]                    = "013c01ff0001c89d9deb96f806029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210143b430e9f6a846103d44de35897dbdf37e320bac29dcf620a3aee0cc6975590d";
 
-const uint8_t  CURRENT_TRANSACTION_VERSION                  = 1;
-const uint8_t  BLOCK_MAJOR_VERSION_1                        = 1;
-const uint8_t  BLOCK_MINOR_VERSION_0                        = 0;
+const uint8_t  TRANSACTION_VERSION_1						= 1;
+const uint8_t  TRANSACTION_VERSION_2						= 2;
+const uint8_t  CURRENT_TRANSACTION_VERSION					= TRANSACTION_VERSION_1;
+const uint8_t  BLOCK_MAJOR_VERSION_1						= 1;
+const uint8_t  BLOCK_MAJOR_VERSION_2						= 2;
+const uint8_t  BLOCK_MAJOR_VERSION_3						= 3;
+const uint8_t  BLOCK_MINOR_VERSION_0						= 0;
+const uint8_t  BLOCK_MINOR_VERSION_1						= 1;
+
 
 const size_t   BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT       = 10000; // by default, blocks ids count in synchronizing
 const size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT           = 128; // by default, blocks count in blocks downloading
@@ -118,6 +136,10 @@ const std::initializer_list<CheckpointData> CHECKPOINTS = {
   { 30000, "841d815eefa01d463ed2a026543cc4b4a6ac6650efcbf4d22e1fb3d9bee57b54" },
   { 35000, "66cb0e1660c486a17a7d80971e312a9ce28b59a9629cb3048d809deed81a3bad" },
   { 40000, "0ff15f0d2e33fe37c15ebdf8fdeadc65b76ccf9fb48b8e4b6337901afcf049c6" },
+  { 45000, "613703a52949ecc33814d8f2cc854d27f853987ca68546bb445ce98cdd720f7c" },
+  { 50000, "22ad335fdfe8aed6d7c6755f49a9f453cf694eb3817d41b13cc9790d6687b856" },
+  { 55000, "63dd33763a6a3a674923831320b27d1eab6b1cf27ec824a41a4b107822f8fcc5" },
+  { 60000, "e2b71ee7f992434081d2ed8d2d6b03f0ea887cd2b58421035e2aff9a5715f73d" },
 };
 
 } // TycheCash

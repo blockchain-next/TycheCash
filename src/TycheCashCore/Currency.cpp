@@ -445,6 +445,89 @@ difficulty_type Currency::nextDifficultyV2(std::vector<uint64_t> timestamps, std
   return low / weightedTimespans;
 }
 
+difficulty_type Currency::nextDifficultyV3(
+	uint8_t version, uint32_t blockIndex,
+	std::vector<uint64_t> timestamps,
+	std::vector<difficulty_type> cumulativeDifficulties
+) const {
+
+	// LWMA difficulty algorithm
+	// Copyright (c) 2017-2018 Zawy
+	// MIT license http://www.opensource.org/licenses/mit-license.php.
+	// This is an improved version of Tom Harding's (Deger8) "WT-144"  
+	// Karbowanec, Masari, Bitcoin Gold, and Bitcoin Cash have contributed.
+	// See https://github.com/zawy12/difficulty-algorithms/issues/3 for other algos.
+	// Do not use "if solvetime < 0 then solvetime = 1" which allows a catastrophic exploit.
+	// T= target_solvetime;
+	// N=45, 60, 70, 100, 140 for T=600, 240, 120, 90, and 60 respectively.
+
+	const int64_t T = static_cast<int64_t>(m_difficultyTarget);
+	size_t N = version == BLOCK_MAJOR_VERSION_2 ?
+		TycheCash::parameters::DIFFICULTY_WINDOW_V2 :
+		TycheCash::parameters::DIFFICULTY_WINDOW_V3;
+
+	if (version == BLOCK_MAJOR_VERSION_2) {
+		if (timestamps.size() > N) {
+			timestamps.resize(N + 1);
+			cumulativeDifficulties.resize(N + 1);
+		}
+	}
+	else {
+		while (timestamps.size() > N + 1) {
+			timestamps.erase(timestamps.begin());
+			cumulativeDifficulties.erase(cumulativeDifficulties.begin());
+		}
+	}
+
+	size_t n = timestamps.size();
+	assert(n == cumulativeDifficulties.size());
+	assert(n <= N + 1);
+
+	// If new coin, just "give away" first 5 blocks at low difficulty
+	if (n < 6) { return  1; }
+	// If height "n" is from 6 to N, then reset N to n-1.
+	else if (n < N + 1) { N = n - 1; }
+
+	// To get an average solvetime to within +/- ~0.1%, use an adjustment factor.
+	const double_t adjust = 0.998;
+	// The divisor k normalizes LWMA.
+	const double_t k = N * (N + 1) / 2;
+
+	double_t LWMA(0), sum_inverse_D(0), harmonic_mean_D(0), nextDifficulty(0);
+	int64_t solveTime(0);
+	uint64_t difficulty(0), next_difficulty(0);
+
+	// Loop through N most recent blocks.
+	for (int64_t i = 1; i <= N; i++) {
+		solveTime = static_cast<int64_t>(timestamps[i]) - static_cast<int64_t>(timestamps[i - 1]);
+		if (version == BLOCK_MAJOR_VERSION_2) {
+			solveTime = std::min<int64_t>((T * 7), std::max<int64_t>(solveTime, (-6 * T)));
+		}
+		else {
+			solveTime = std::min<int64_t>((T * 7), std::max<int64_t>(solveTime, (-7 * T)));
+		}
+		difficulty = cumulativeDifficulties[i] - cumulativeDifficulties[i - 1];
+		LWMA += solveTime * i / k;
+		sum_inverse_D += 1 / static_cast<double_t>(difficulty);
+	}
+
+	// Keep LWMA sane in case something unforeseen occurs.
+	if (static_cast<int64_t>(std::round(LWMA)) < T / 20)
+		LWMA = static_cast<double_t>(T / 20);
+
+	harmonic_mean_D = N / sum_inverse_D * adjust;
+	nextDifficulty = harmonic_mean_D * T / LWMA;
+	next_difficulty = static_cast<uint64_t>(nextDifficulty);
+
+	// minimum limit
+	if (next_difficulty < 1) {
+		next_difficulty = 1;
+	}
+
+	return next_difficulty;
+}
+
+
 bool Currency::checkProofOfWork(Crypto::cn_context& context, const Block& block, difficulty_type currentDiffic,
   Crypto::Hash& proofOfWork) const {
 

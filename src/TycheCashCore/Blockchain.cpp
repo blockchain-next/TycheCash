@@ -632,6 +632,7 @@ bool Blockchain::getBlockHeight(const Crypto::Hash& blockId, uint32_t& blockHeig
 }
 
 difficulty_type Blockchain::getDifficultyForNextBlock() {
+	uint8_t version; uint32_t blockindex;
   std::lock_guard<decltype(m_blockchain_lock)> lk(m_blockchain_lock);
   std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> commulative_difficulties;
@@ -647,8 +648,12 @@ difficulty_type Blockchain::getDifficultyForNextBlock() {
 
   if (m_blocks.size() <= parameters::TycheCash_HARDFORK_HEIGHT_V2) {
     return m_currency.nextDifficulty(timestamps, commulative_difficulties);
-  } else {
-    return m_currency.nextDifficultyV2(timestamps, commulative_difficulties);
+    }
+  else if (m_blocks.size() <= parameters::TycheCash_HARDFORK_HEIGHT_V3) {
+	  return m_currency.nextDifficultyV2(timestamps, commulative_difficulties);
+  }
+  else {
+	  return m_currency.nextDifficultyV3(version, blockindex,timestamps, commulative_difficulties);
   }
 }
 
@@ -763,7 +768,8 @@ bool Blockchain::switch_to_alternative_blockchain(std::list<blocks_ext_by_hash::
 }
 
 difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std::list<blocks_ext_by_hash::iterator>& alt_chain, BlockEntry& bei) {
-  std::vector<uint64_t> timestamps;
+	uint8_t version; uint32_t blockindex;
+	std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> commulative_difficulties;
   if (alt_chain.size() < m_currency.difficultyBlocksCount()) {
     std::lock_guard<decltype(m_blockchain_lock)> lk(m_blockchain_lock);
@@ -804,8 +810,11 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
 
   if (alt_chain.size() <= parameters::TycheCash_HARDFORK_HEIGHT_V2) {
     return m_currency.nextDifficulty(timestamps, commulative_difficulties);
-  } else {
-    return m_currency.nextDifficultyV2(timestamps, commulative_difficulties);
+  } else if (alt_chain.size() <= parameters::TycheCash_HARDFORK_HEIGHT_V3) {
+	  return m_currency.nextDifficultyV2(timestamps, commulative_difficulties);
+  }
+  else {
+	  return m_currency.nextDifficultyV3(version, blockindex, timestamps, commulative_difficulties);
   }
 }
 
