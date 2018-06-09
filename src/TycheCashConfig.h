@@ -15,9 +15,9 @@ const size_t   TycheCash_MAX_BLOCK_BLOB_SIZE                = 500000000;
 const size_t   TycheCash_MAX_TX_SIZE                        = 1000000000;
 const uint64_t TycheCash_PUBLIC_ADDRESS_BASE58_PREFIX       = 0x31;
 const size_t   TycheCash_MINED_MONEY_UNLOCK_WINDOW          = 60;
-const uint64_t TycheCash_BLOCK_FUTURE_TIME_LIMIT            = 60 * 60 * 2;
+const uint64_t TycheCash_BLOCK_FUTURE_TIME_LIMIT            = 60 * 2;
 const size_t   TycheCash_HARDFORK_HEIGHT_V2                 = 12998;
-const size_t   TycheCash_HARDFORK_HEIGHT_V3		    = 61010;
+const size_t   TycheCash_HARDFORK_HEIGHT_V3		              = 61010;
 
 const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW            = 30;
 
