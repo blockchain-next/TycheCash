@@ -15,9 +15,11 @@ const size_t   TycheCash_MAX_BLOCK_BLOB_SIZE                = 500000000;
 const size_t   TycheCash_MAX_TX_SIZE                        = 1000000000;
 const uint64_t TycheCash_PUBLIC_ADDRESS_BASE58_PREFIX       = 0x31;
 const size_t   TycheCash_MINED_MONEY_UNLOCK_WINDOW          = 60;
-const uint64_t TycheCash_BLOCK_FUTURE_TIME_LIMIT            = 60 * 2;
+const uint64_t TycheCash_BLOCK_FUTURE_TIME_LIMIT            = 60 * 60 *2;
+const uint64_t TycheCash_BLOCK_FUTURE_TIME_LIMIT_V1			= 60 ;
 const size_t   TycheCash_HARDFORK_HEIGHT_V2                 = 12998;
-const size_t   TycheCash_HARDFORK_HEIGHT_V3		              = 61010;
+const size_t   TycheCash_HARDFORK_HEIGHT_V3		            = 61010;
+const size_t   TycheCash_HARDFORK_HEIGHT_V4					= 76000;
 
 const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW            = 30;
 
@@ -112,7 +114,6 @@ const char     P2P_STAT_TRUSTED_PUB_KEY[]                   = "8f80f9a5a434a9f15
 const std::initializer_list<const char*> SEED_NODES = {
   "node1.tychecash.net:17017",
   "node2.tychecash.net:17017",
-  "node3.tychecash.net:17017",
 };
 
 struct CheckpointData {
@@ -143,7 +144,7 @@ const std::initializer_list<CheckpointData> CHECKPOINTS = {
   { 60000, "e2b71ee7f992434081d2ed8d2d6b03f0ea887cd2b58421035e2aff9a5715f73d" },
   { 65000, "0dbff646445601e51eff2a42a6196a3cdc0b0623056b3eb8d66134fea2ac35a7" },
   { 70000, "df183aeccfc35621014e16f5714266cbdcaef0e9ec046d18046c3c18f27268ee" },
-  { 74945, "4b569259621685a069daa07d4a9782590df2708363be117ebc25655d2315a6b5" },
+  { 75000, "7f6b124b673c7d14a9698c238f3cf0504e230ab6301ce43fef3b83055bcacf93" },
 };
 
 } // TycheCash
