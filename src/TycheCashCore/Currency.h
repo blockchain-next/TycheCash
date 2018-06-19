@@ -100,6 +100,8 @@ public:
   difficulty_type nextDifficultyV2(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties, size_t targetSeconds = parameters::DIFFICULTY_TARGET) const;
   difficulty_type nextDifficultyV3(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const;
 
+  difficulty_type nextDifficultyV4(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties, uint32_t blockIndex) const;
+
   bool checkProofOfWork(Crypto::cn_context& context, const Block& block, difficulty_type currentDiffic, Crypto::Hash& proofOfWork) const;
 
   size_t getApproximateMaximumInputCount(size_t transactionSize, size_t outputCount, size_t mixinCount) const;
