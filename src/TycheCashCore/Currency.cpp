@@ -527,6 +527,37 @@ difficulty_type Currency::nextDifficultyV3(
 	return next_difficulty;
 }
 
+difficulty_type Currency::nextDifficultyV4(std::vector<uint64_t> timestamps,
+	std::vector<difficulty_type> cumulativeDifficulties, uint32_t blockIndex) const {
+
+	int64_t T = parameters::DIFFICULTY_TARGET;
+	int64_t N = parameters::DIFFICULTY_WINDOW_V1 - 1; //  N=45, 60, and 90 for T=600, 120, 60.
+	int64_t FTL = parameters::TycheCash_BLOCK_FUTURE_TIME_LIMIT_V1; // < 3xT
+	int64_t L(0), ST, sum_3_ST(0), next_D, prev_D;
+
+	// Hardcode difficulty for N blocks after fork height: 
+	if (blockIndex >= parameters::TycheCash_HARDFORK_HEIGHT_V4 && blockIndex <= parameters::TycheCash_HARDFORK_HEIGHT_V4 + N) {
+		return 1000000000;
+	}
+
+	for (int64_t i = 1; i <= N; i++) {
+		// +/- FTL limits are bad timestamp protection.  6xT limits drop in D to reduce oscillations.
+		ST = std::max(-FTL, std::min((int64_t)(timestamps[i]) - (int64_t)(timestamps[i - 1]), 6 * T));
+		L += ST * i; // Give more weight to most recent blocks.
+		if (i > N - 3) { sum_3_ST += ST; }
+	}
+
+	// Calculate next_D = avgD * T / LWMA(STs) using integer math
+	next_D = ((cumulativeDifficulties[N] - cumulativeDifficulties[0])*T*(N + 1) * 99) / (100 * 2 * L);
+
+	// Implement LWMA-2 changes from LWMA
+	prev_D = cumulativeDifficulties[N] - cumulativeDifficulties[N - 1];
+	if (sum_3_ST < (8 * T) / 10) { next_D = (prev_D * 110) / 100; }
+
+	return static_cast<uint64_t>(next_D);
+
+	// next_Target = sumTargets*L*2/0.998/T/(N+1)/N/N; // To show the difference.
+}
 
 bool Currency::checkProofOfWork(Crypto::cn_context& context, const Block& block, difficulty_type currentDiffic,
   Crypto::Hash& proofOfWork) const {
