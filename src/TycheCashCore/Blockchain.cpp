@@ -652,8 +652,11 @@ difficulty_type Blockchain::getDifficultyForNextBlock() {
   else if (m_blocks.size() <= parameters::TycheCash_HARDFORK_HEIGHT_V3) {
 	  return m_currency.nextDifficultyV2(timestamps, commulative_difficulties);
   }
+  else if (m_blocks.size() <= parameters::TycheCash_HARDFORK_HEIGHT_V4) {
+	  return m_currency.nextDifficultyV3(version, blockindex, timestamps, commulative_difficulties);
+  }
   else {
-	  return m_currency.nextDifficultyV3(version, blockindex,timestamps, commulative_difficulties);
+	  return m_currency.nextDifficultyV4(timestamps, commulative_difficulties, blockindex);
   }
 }
 
@@ -813,8 +816,12 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
   } else if (alt_chain.size() <= parameters::TycheCash_HARDFORK_HEIGHT_V3) {
 	  return m_currency.nextDifficultyV2(timestamps, commulative_difficulties);
   }
-  else {
+  else if (alt_chain.size() <= parameters::TycheCash_HARDFORK_HEIGHT_V4) {
 	  return m_currency.nextDifficultyV3(version, blockindex, timestamps, commulative_difficulties);
+  }
+  else {
+	  logger(INFO, BRIGHT_RED) << "UPGRADED";
+	  return m_currency.nextDifficultyV4(timestamps, commulative_difficulties, blockindex);
   }
 }
 
