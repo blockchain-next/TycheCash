@@ -47,6 +47,7 @@ public:
   size_t difficultyLag() const { return m_difficultyLag; }
   size_t difficultyCut() const { return m_difficultyCut; }
   size_t difficultyBlocksCount() const { return m_difficultyWindow + m_difficultyLag; }
+  size_t difficultyBlocksCountV5() const { return parameters::DIFFICULTY_WINDOW_V1 + 1; }
 
   size_t maxBlockSizeInitial() const { return m_maxBlockSizeInitial; }
   uint64_t maxBlockSizeGrowthSpeedNumerator() const { return m_maxBlockSizeGrowthSpeedNumerator; }
@@ -98,9 +99,10 @@ public:
 
   difficulty_type nextDifficulty(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const;
   difficulty_type nextDifficultyV2(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties, size_t targetSeconds = parameters::DIFFICULTY_TARGET) const;
-  difficulty_type nextDifficultyV3(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const;
+  difficulty_type nextDifficultyV3(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const;
 
-  difficulty_type nextDifficultyV4(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties, uint32_t blockIndex) const;
+  difficulty_type nextDifficultyV4(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const;
+  difficulty_type nextDifficultyV5(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const;
 
   bool checkProofOfWork(Crypto::cn_context& context, const Block& block, difficulty_type currentDiffic, Crypto::Hash& proofOfWork) const;
 
