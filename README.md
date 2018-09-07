@@ -83,9 +83,9 @@ Install Xcode
   
   $`tar --bzip2 -xf boost_1_67_0.tar.bz2`
   
-  $`cd boost_1_167_0`
+  $`cd boost_1_67_0`
   
-  $`./bootstrap.sh --prefix=/usr/local/include`
+  $`./bootstrap.sh --prefix=/usr/local/`
   
   $`sudo ./b2 install`
   
