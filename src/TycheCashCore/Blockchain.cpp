@@ -778,7 +778,6 @@ bool Blockchain::switch_to_alternative_blockchain(std::list<blocks_ext_by_hash::
 }
 
 difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std::list<blocks_ext_by_hash::iterator>& alt_chain, BlockEntry& bei) {
-	uint32_t blockindex;
 	std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> commulative_difficulties;
   size_t difficultyBlocksCount;

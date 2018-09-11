@@ -53,6 +53,19 @@ void tree_hash(const char (*hashes)[HASH_SIZE], size_t count, char *root_hash) {
   }
 }
 
+size_t tree_depth(size_t count) {
+	size_t i;
+	size_t depth = 0;
+	assert(count > 0);
+	for (i = sizeof(size_t) << 2; i > 0; i >>= 1) {
+		if (count >> i > 0) {
+			count >>= i;
+			depth += i;
+		}
+	}
+	return depth;
+}
+
 void tree_branch(const char (*hashes)[HASH_SIZE], size_t count, char (*branch)[HASH_SIZE]) {
   size_t i, j;
   size_t cnt = 1;
