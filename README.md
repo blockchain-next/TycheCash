@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://tychecoin.com/wp-content/uploads/coinspng.png" title="TycheCash">
+</p>
+
 # TycheCash
 ## Ubuntu 14.xx Install Guide
 
