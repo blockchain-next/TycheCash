@@ -129,6 +129,7 @@ bool RpcServer::processJsonRpcRequest(const HttpRequest& request, HttpResponse& 
     jsonResponse.setId(jsonRequest.getId()); // copy id
 
     static std::unordered_map<std::string, RpcServer::RpcHandler<JsonMemberMethod>> jsonRpcHandlers = {
+      { "f_transaction_json", { makeMemberMethod(&RpcServer::on_get_transactions), false } },
       { "getblockcount", { makeMemberMethod(&RpcServer::on_getblockcount), true } },
       { "on_getblockhash", { makeMemberMethod(&RpcServer::on_getblockhash), false } },
       { "getblocktemplate", { makeMemberMethod(&RpcServer::on_getblocktemplate), false } },
@@ -358,6 +359,7 @@ bool RpcServer::on_get_transactions(const COMMAND_RPC_GET_TRANSACTIONS::request&
     res.missed_tx.push_back(Common::podToHex(miss_tx));
   }
 
+  res.tx_as_json = TycheCash::storeToJson(txs.front());
   res.status = CORE_RPC_STATUS_OK;
   return true;
 }
