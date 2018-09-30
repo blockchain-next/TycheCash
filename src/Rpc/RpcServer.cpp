@@ -129,7 +129,8 @@ bool RpcServer::processJsonRpcRequest(const HttpRequest& request, HttpResponse& 
     jsonResponse.setId(jsonRequest.getId()); // copy id
 
     static std::unordered_map<std::string, RpcServer::RpcHandler<JsonMemberMethod>> jsonRpcHandlers = {
-      { "f_transaction_json", { makeMemberMethod(&RpcServer::on_get_transactions), false } },
+      { "f_block_json", { makeMemberMethod(&RpcServer::f_on_block_json), false } },
+	  { "f_transaction_json", { makeMemberMethod(&RpcServer::on_get_transactions), false } },
       { "getblockcount", { makeMemberMethod(&RpcServer::on_getblockcount), true } },
       { "on_getblockhash", { makeMemberMethod(&RpcServer::on_getblockhash), false } },
       { "getblocktemplate", { makeMemberMethod(&RpcServer::on_getblocktemplate), false } },
@@ -443,6 +444,36 @@ bool RpcServer::on_stop_daemon(const COMMAND_RPC_STOP_DAEMON::request& req, COMM
 //------------------------------------------------------------------------------------------------------------------------------
 // JSON RPC methods
 //------------------------------------------------------------------------------------------------------------------------------
+
+bool RpcServer::f_on_block_json(const F_COMMAND_RPC_GET_BLOCK_DETAILS::request& req, F_COMMAND_RPC_GET_BLOCK_DETAILS::response& res) {
+
+  Crypto::Hash block_hash;
+  if (!parse_hash256(req.hash, block_hash)) {
+	return false;
+  }
+
+  std::list<Crypto::Hash> block_ids;
+  block_ids.push_back(block_hash);
+  std::list<TycheCash::Block> blocks;
+  std::list<Crypto::Hash> missed_ids;
+  m_core.get_blocks(block_ids, blocks, missed_ids);
+
+  if (1 == blocks.size())
+  {
+	res.json_response = TycheCash::storeToJson(blocks.front());
+  }
+  else
+  {
+  throw JsonRpc::JsonRpcError{
+	  CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
+	  "Internal error: can't get block by hash. Hash = " + req.hash + '.' };
+	return false;
+  }
+
+  res.status = CORE_RPC_STATUS_OK;
+  return true;
+}
+
 bool RpcServer::on_getblockcount(const COMMAND_RPC_GETBLOCKCOUNT::request& req, COMMAND_RPC_GETBLOCKCOUNT::response& res) {
   res.count = m_core.get_current_blockchain_height();
   res.status = CORE_RPC_STATUS_OK;

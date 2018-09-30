@@ -555,11 +555,11 @@ struct F_COMMAND_RPC_GET_BLOCK_DETAILS {
   };
 
   struct response {
-    f_block_details_response block;
+	std::string json_response;
     std::string status;
 
     void serialize(ISerializer &s) {
-      KV_MEMBER(block)
+      KV_MEMBER(json_response)
       KV_MEMBER(status)
     }
   };
