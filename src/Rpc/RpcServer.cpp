@@ -7,6 +7,9 @@
 #include <future>
 #include <unordered_map>
 
+#include <sstream>
+#include <iomanip>
+
 // TycheCash
 #include "Common/StringTools.h"
 #include "TycheCashCore/TycheCashTools.h"
@@ -66,6 +69,19 @@ RpcServer::HandlerFunction jsonMethod(bool (RpcServer::*handler)(typename Comman
   };
 }
 
+}
+
+std::string escape_json(const std::string &s) {
+    std::ostringstream o;
+    for (auto c = s.cbegin(); c != s.cend(); c++) {
+        if (*c == '"' || *c == '\\' || ('\x00' <= *c && *c <= '\x1f')) {
+            o << "\\u"
+              << std::hex << std::setw(4) << std::setfill('0') << (int)*c;
+        } else {
+            o << *c;
+        }
+    }
+    return o.str();
 }
   
 std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction>> RpcServer::s_handlers = {
@@ -360,7 +376,7 @@ bool RpcServer::on_get_transactions(const COMMAND_RPC_GET_TRANSACTIONS::request&
     res.missed_tx.push_back(Common::podToHex(miss_tx));
   }
 
-  res.tx_as_json = TycheCash::storeToJson(txs.front());
+  res.tx_as_json = TycheCash::escape_json(TycheCash::storeToJson(txs.front()));
   res.status = CORE_RPC_STATUS_OK;
   return true;
 }
@@ -460,7 +476,7 @@ bool RpcServer::f_on_block_json(const F_COMMAND_RPC_GET_BLOCK_DETAILS::request& 
 
   if (1 == blocks.size())
   {
-	res.json_response = TycheCash::storeToJson(blocks.front());
+	res.json_response = TycheCash::escape_json(TycheCash::storeToJson(blocks.front()));
   }
   else
   {
