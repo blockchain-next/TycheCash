@@ -146,6 +146,7 @@ bool RpcServer::processJsonRpcRequest(const HttpRequest& request, HttpResponse& 
 
     static std::unordered_map<std::string, RpcServer::RpcHandler<JsonMemberMethod>> jsonRpcHandlers = {
       { "f_block_json", { makeMemberMethod(&RpcServer::f_on_block_json), false } },
+{ "f_blocks_list_json", { makeMemberMethod(&RpcServer::f_on_blocks_list_json), false } },
 	  { "f_transaction_json", { makeMemberMethod(&RpcServer::on_get_transactions), false } },
       { "getblockcount", { makeMemberMethod(&RpcServer::on_getblockcount), true } },
       { "on_getblockhash", { makeMemberMethod(&RpcServer::on_getblockhash), false } },
@@ -460,7 +461,51 @@ bool RpcServer::on_stop_daemon(const COMMAND_RPC_STOP_DAEMON::request& req, COMM
 //------------------------------------------------------------------------------------------------------------------------------
 // JSON RPC methods
 //------------------------------------------------------------------------------------------------------------------------------
+bool RpcServer::f_on_blocks_list_json(const F_COMMAND_RPC_GET_BLOCKS_LIST::request& req, F_COMMAND_RPC_GET_BLOCKS_LIST::response& res) {
+  if (m_core.get_current_blockchain_height() <= req.height) {
+    throw JsonRpc::JsonRpcError{ CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
+      std::string("To big height: ") + std::to_string(req.height) + ", current blockchain height = " + std::to_string(m_core.get_current_blockchain_height()) };
+  }
 
+  uint32_t print_blocks_count = 30;
+  uint32_t last_height = req.height - print_blocks_count;
+  if (req.height <= print_blocks_count)  {
+    last_height = 0;
+  } 
+
+  for (uint32_t i = req.height; i >= last_height; i--) {
+    Hash block_hash = m_core.getBlockIdByHeight(static_cast<uint32_t>(i));
+    Block blk;
+    if (!m_core.getBlockByHash(block_hash, blk)) {
+      throw JsonRpc::JsonRpcError{ CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
+        "Internal error: can't get block by height. Height = " + std::to_string(i) + '.' };
+    }
+
+    size_t tx_cumulative_block_size;
+    m_core.getBlockSize(block_hash, tx_cumulative_block_size);
+    size_t blokBlobSize = getObjectBinarySize(blk);
+    size_t minerTxBlobSize = getObjectBinarySize(blk.baseTransaction);
+    difficulty_type blockDiff;
+    m_core.getBlockDifficulty(static_cast<uint32_t>(i), blockDiff);
+
+    f_block_short_response block_short;
+    block_short.cumul_size = blokBlobSize + tx_cumulative_block_size - minerTxBlobSize;
+    block_short.timestamp = blk.timestamp;
+    block_short.height = i;
+    block_short.hash = Common::podToHex(block_hash);
+    block_short.cumul_size = blokBlobSize + tx_cumulative_block_size - minerTxBlobSize;
+    block_short.tx_count = blk.transactionHashes.size() + 1;
+	block_short.difficulty = blockDiff;
+
+    res.blocks.push_back(block_short);
+
+    if (i == 0)
+      break;
+  }
+
+  res.status = CORE_RPC_STATUS_OK;
+  return true;
+}
 bool RpcServer::f_on_block_json(const F_COMMAND_RPC_GET_BLOCK_DETAILS::request& req, F_COMMAND_RPC_GET_BLOCK_DETAILS::response& res) {
 
   Crypto::Hash block_hash;

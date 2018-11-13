@@ -437,6 +437,7 @@ struct f_block_short_response {
   std::string hash;
   uint64_t tx_count;
   uint64_t cumul_size;
+  difficulty_type difficulty;
 
   void serialize(ISerializer &s) {
     KV_MEMBER(timestamp)
